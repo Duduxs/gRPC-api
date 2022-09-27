@@ -2,11 +2,20 @@ plugins {
 	id 'org.springframework.boot' version '2.7.4'
 	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
 	id 'java'
+	id 'application'
 }
 
-group = 'com.edudev'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '19'
+group = "com.edudev"
+version = "0.0.1-SNAPSHOT"
+
+application {
+	mainClass = 'com.edudev.grpcspringapi.GrpcSpringApiApplication'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
 
 configurations {
 	compileOnly {
