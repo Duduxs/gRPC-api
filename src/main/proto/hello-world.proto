@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_package = "com.edudev.grpcspringapi";
+option java_multiple_files = true;
+
+package com.edudev.grpcspringapi;
+
+service HelloService {
+  rpc Hello(HelloReq) returns (HelloRes);
+}
+
+message HelloReq {
+  string message = 1;
+}
+
+message HelloRes {
+  string message = 1;
+}
