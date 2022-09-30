@@ -5,7 +5,7 @@ option java_multiple_files = true;
 
 package com.edudev.grpcspringapi;
 
-service Service {
+service ProductService {
   rpc Create(ProductRequest) returns (ProductResponse);
   rpc FindById(RequestById) returns (ProductResponse);
   rpc DeleteById(RequestById) returns (ProductResponse);
