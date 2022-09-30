@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+option java_package = "com.edudev.grpcspringapi";
+option java_multiple_files = true;
+
+package com.edudev.grpcspringapi;
+
+service Service {
+  rpc Create(ProductRequest) returns (ProductResponse);
+  rpc FindById(RequestById) returns (ProductResponse);
+  rpc DeleteById(RequestById) returns (ProductResponse);
+  rpc FindAll(EmptyRequest) returns (ProductResponseList);
+}
+
+message ProductRequest {
+  string name = 1;
+  float price = 2;
+  int32 stockQuantity = 3;
+}
+
+message ProductResponse {
+  int64 id = 1;
+  string name = 2;
+  float price = 3;
+  int32 stockQuantity = 4;
+}
+
+message RequestById {
+  int64 id = 1;
+}
+
+message EmptyRequest {}
+
+message ProductResponseList {
+  repeated ProductResponse data = 1;
+}
