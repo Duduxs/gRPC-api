@@ -5,7 +5,6 @@ import com.edudev.grpcspringapi.dto.ProductInputDTO;
 import com.edudev.grpcspringapi.exception.ProductAlreadyExistsException;
 import com.edudev.grpcspringapi.exception.ProductNotFoundException;
 import com.edudev.grpcspringapi.repository.ProductRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,10 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -120,6 +119,34 @@ public class ProductServiceImplTest {
     }
 
     @Nested
+    class FindAll {
+
+        @Test
+        @DisplayName("Should be able to find all products")
+        public void findAll() {
+
+            var products = List.of(
+                    new Product(1L, "Product", 1.0, 10),
+                    new Product(2L, "Product 2", 1.0, 10)
+            );
+
+            when(repository.findAll())
+                    .thenReturn(products);
+
+            var output = service.findAll();
+
+            verify(repository).findAll();
+
+            assertThat(output)
+                    .extracting("id", "name", "price", "quantityInStock")
+                    .contains(
+                            tuple(1L, "Product", 1.0, 10),
+                            tuple(2L, "Product 2", 1.0, 10)
+                    );
+        }
+    }
+
+    @Nested
     class Delete {
 
         @Test
@@ -131,7 +158,7 @@ public class ProductServiceImplTest {
             when(repository.findById(any()))
                     .thenReturn(Optional.of(product));
 
-            Assertions.assertThatNoException().isThrownBy(() ->service.deleteBy(1L));
+            assertThatNoException().isThrownBy(() -> service.deleteBy(1L));
 
             verify(repository).findById(any());
             verify(repository).delete(any());

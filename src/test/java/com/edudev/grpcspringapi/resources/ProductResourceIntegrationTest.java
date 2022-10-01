@@ -1,8 +1,6 @@
 package com.edudev.grpcspringapi.resources;
 
-import com.edudev.grpcspringapi.ProductRequest;
-import com.edudev.grpcspringapi.ProductResponse;
-import com.edudev.grpcspringapi.RequestById;
+import com.edudev.grpcspringapi.*;
 import io.grpc.StatusRuntimeException;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.flywaydb.core.Flyway;
@@ -17,6 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import static com.edudev.grpcspringapi.ProductServiceGrpc.ProductServiceBlockingStub;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -107,6 +106,27 @@ public class ProductResourceIntegrationTest {
                     "Product with ID 3 wasn't found."
             );
 
+        }
+
+    }
+
+    @Nested
+    class FindAll {
+
+        @Test
+        @DisplayName("Should be able to list all products with success")
+        public void findAllProduct() {
+
+            var products = service.findAll(EmptyRequest.newBuilder().build());
+
+            assertThat(products).isInstanceOf(ProductResponseList.class);
+            assertThat(products.getDataCount()).isEqualTo(2L);
+            assertThat(products.getDataList())
+                    .extracting("id", "name", "price", "stockQuantity")
+                    .contains(
+                            tuple(1L, "Product A", 10.99, 10),
+                            tuple(2L, "Product B", 10.99, 10)
+                    );
         }
 
     }

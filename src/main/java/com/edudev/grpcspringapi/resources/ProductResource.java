@@ -1,14 +1,13 @@
 package com.edudev.grpcspringapi.resources;
 
-import com.edudev.grpcspringapi.EmptyResponse;
-import com.edudev.grpcspringapi.ProductRequest;
-import com.edudev.grpcspringapi.ProductResponse;
+import com.edudev.grpcspringapi.*;
 import com.edudev.grpcspringapi.ProductServiceGrpc.ProductServiceImplBase;
-import com.edudev.grpcspringapi.RequestById;
 import com.edudev.grpcspringapi.dto.ProductInputDTO;
 import com.edudev.grpcspringapi.services.IProductService;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
+
+import java.util.stream.Collectors;
 
 @GrpcService
 public class ProductResource extends ProductServiceImplBase {
@@ -34,6 +33,26 @@ public class ProductResource extends ProductServiceImplBase {
         responseObserver.onNext(productResponse);
         responseObserver.onCompleted();
 
+    }
+
+    @Override
+    public void findAll(EmptyRequest request, StreamObserver<ProductResponseList> responseObserver) {
+        var output = productService.findAll()
+                .stream()
+                .map(product -> ProductResponse.newBuilder()
+                        .setId(product.id())
+                        .setName(product.name())
+                        .setPrice(product.price())
+                        .setStockQuantity(product.quantityInStock())
+                        .build()
+                ).collect(Collectors.toList());
+
+        var products = ProductResponseList.newBuilder()
+                .addAllData(output)
+                .build();
+
+        responseObserver.onNext(products);
+        responseObserver.onCompleted();
     }
 
     @Override
