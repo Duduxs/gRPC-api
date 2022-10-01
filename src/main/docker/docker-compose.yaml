@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  grpc-spring-api-database:
+    container_name: grpc-product-spring-api-database
+    restart: always
+    image: 'postgres'
+    ports:
+      - '5443:5435'
+    environment:
+      POSTGRES_USER: eduardo
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: grpc-product-spring-api-database
+    volumes:
+      - /volumes:/var/lib/postgresql/data
+
