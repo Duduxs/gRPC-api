@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/grpc-product-spring-api-database
+    url: jdbc:postgresql://localhost:5443/grpc-product-spring-api-database
     username: eduardo
     password: root
   jpa:

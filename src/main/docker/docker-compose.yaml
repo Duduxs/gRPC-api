@@ -4,6 +4,8 @@ services:
   grpc-spring-api-database:
     container_name: grpc-product-spring-api-database
     restart: always
+    command:
+      - -p 5435
     image: 'postgres'
     ports:
       - '5443:5435'
