@@ -5,7 +5,7 @@ import com.edudev.grpcspringapi.dto.ProductInputDTO;
 import com.edudev.grpcspringapi.exception.ProductAlreadyExistsException;
 import com.edudev.grpcspringapi.exception.ProductNotFoundException;
 import com.edudev.grpcspringapi.repository.ProductRepository;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 
@@ -105,7 +106,7 @@ public class ProductServiceImplTest {
                     .thenReturn(Optional.empty());
 
 
-            Assertions.assertThrows(
+            assertThrows(
                     ProductNotFoundException.class,
                     () -> service.findById(1L),
                     "Product with ID 1 wasn't found."
@@ -118,4 +119,42 @@ public class ProductServiceImplTest {
 
     }
 
+    @Nested
+    class Delete {
+
+        @Test
+        @DisplayName("Should be able to delete a product by its id")
+        public void delete() {
+
+            var product = new Product(1L, "Product", 1.0, 10);
+
+            when(repository.findById(any()))
+                    .thenReturn(Optional.of(product));
+
+            Assertions.assertThatNoException().isThrownBy(() ->service.deleteBy(1L));
+
+            verify(repository).findById(any());
+            verify(repository).delete(any());
+
+        }
+
+        @Test
+        @DisplayName("Should be able to throw Product not found when id doesn't exists in delete")
+        public void deleteByIdShouldThrow() {
+
+            when(repository.findById(any()))
+                    .thenReturn(Optional.empty());
+
+
+            assertThrows(
+                    ProductNotFoundException.class,
+                    () -> service.deleteBy(1L),
+                    "Product with ID 1 wasn't found."
+            );
+
+            verify(repository).findById(any());
+
+        }
+
+    }
 }

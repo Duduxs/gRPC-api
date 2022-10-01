@@ -8,7 +8,7 @@ package com.edudev.grpcspringapi;
 service ProductService {
   rpc Create(ProductRequest) returns (ProductResponse);
   rpc FindById(RequestById) returns (ProductResponse);
-  rpc DeleteById(RequestById) returns (ProductResponse);
+  rpc DeleteById(RequestById) returns (EmptyResponse);
   rpc FindAll(EmptyRequest) returns (ProductResponseList);
 }
 
@@ -30,6 +30,7 @@ message RequestById {
 }
 
 message EmptyRequest {}
+message EmptyResponse {}
 
 message ProductResponseList {
   repeated ProductResponse data = 1;

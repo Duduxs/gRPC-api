@@ -6,7 +6,10 @@ import com.edudev.grpcspringapi.RequestById;
 import io.grpc.StatusRuntimeException;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -14,6 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import static com.edudev.grpcspringapi.ProductServiceGrpc.ProductServiceBlockingStub;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -97,7 +101,7 @@ public class ProductResourceIntegrationTest {
 
             var productFindByIdRequest = RequestById.newBuilder().setId(3L).build();
 
-            Assertions.assertThrows(
+            assertThrows(
                     StatusRuntimeException.class,
                     () -> service.findById(productFindByIdRequest),
                     "Product with ID 3 wasn't found."
@@ -105,7 +109,36 @@ public class ProductResourceIntegrationTest {
 
         }
 
+    }
+
+    @Nested
+    class Delete {
+
+        @Test
+        @DisplayName("Should be able to delete a product with success")
+        public void deleteProduct() {
+
+            var productFindByIdRequest = RequestById.newBuilder().setId(1).build();
+
+            assertDoesNotThrow(() -> service.deleteById(productFindByIdRequest));
+
+        }
+
+        @Test
+        @DisplayName("Should be able to throw exception when product don't exists by id")
+        public void deleteProductShouldThrowError() {
+
+            var productFindByIdRequest = RequestById.newBuilder().setId(3L).build();
+
+            assertThrows(
+                    StatusRuntimeException.class,
+                    () -> service.deleteById(productFindByIdRequest),
+                    "Product with ID 3 wasn't found."
+            );
+
+        }
 
     }
+
 
 }

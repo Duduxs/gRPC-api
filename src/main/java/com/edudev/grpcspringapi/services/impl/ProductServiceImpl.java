@@ -45,7 +45,8 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public void deleteBy(Long id) {
-        repository.deleteById(id);
+        var product= repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
+        repository.delete(product);
     }
 
     private void checkDuplicity(String name) {

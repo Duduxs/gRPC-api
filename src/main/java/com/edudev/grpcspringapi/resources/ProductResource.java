@@ -1,5 +1,6 @@
 package com.edudev.grpcspringapi.resources;
 
+import com.edudev.grpcspringapi.EmptyResponse;
 import com.edudev.grpcspringapi.ProductRequest;
 import com.edudev.grpcspringapi.ProductResponse;
 import com.edudev.grpcspringapi.ProductServiceGrpc.ProductServiceImplBase;
@@ -16,6 +17,23 @@ public class ProductResource extends ProductServiceImplBase {
 
     public ProductResource(IProductService productService) {
         this.productService = productService;
+    }
+
+    @Override
+    public void findById(RequestById request, StreamObserver<ProductResponse> responseObserver) {
+
+        var product = productService.findById(request.getId());
+
+        var productResponse = ProductResponse.newBuilder()
+                .setId(product.id())
+                .setName(product.name())
+                .setPrice(product.price())
+                .setStockQuantity(product.quantityInStock())
+                .build();
+
+        responseObserver.onNext(productResponse);
+        responseObserver.onCompleted();
+
     }
 
     @Override
@@ -38,19 +56,9 @@ public class ProductResource extends ProductServiceImplBase {
     }
 
     @Override
-    public void findById(RequestById request, StreamObserver<ProductResponse> responseObserver) {
-
-        var product = productService.findById(request.getId());
-
-        var productResponse = ProductResponse.newBuilder()
-                .setId(product.id())
-                .setName(product.name())
-                .setPrice(product.price())
-                .setStockQuantity(product.quantityInStock())
-                .build();
-
-        responseObserver.onNext(productResponse);
+    public void deleteById(RequestById request, StreamObserver<EmptyResponse> responseObserver) {
+        productService.deleteBy(request.getId());
+        responseObserver.onNext(EmptyResponse.newBuilder().build());
         responseObserver.onCompleted();
-
     }
 }
