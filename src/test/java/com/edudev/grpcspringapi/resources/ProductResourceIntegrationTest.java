@@ -2,12 +2,11 @@ package com.edudev.grpcspringapi.resources;
 
 import com.edudev.grpcspringapi.ProductRequest;
 import com.edudev.grpcspringapi.ProductResponse;
+import com.edudev.grpcspringapi.RequestById;
 import io.grpc.StatusRuntimeException;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -34,44 +33,79 @@ public class ProductResourceIntegrationTest {
         flyway.migrate();
     }
 
-    @Test
-    @DisplayName("Should be able to create a product")
-    public void createProduct() {
+    @Nested
+    class Create {
 
-        var productRequest = ProductRequest
-                .newBuilder()
-                .setName("product name")
-                .setPrice(2.0)
-                .setStockQuantity(9)
-                .build();
+        @Test
+        @DisplayName("Should be able to create a product")
+        public void createProduct() {
 
-        ProductResponse productResponse = service.create(productRequest);
+            var productRequest = ProductRequest
+                    .newBuilder()
+                    .setName("product name")
+                    .setPrice(2.0)
+                    .setStockQuantity(9)
+                    .build();
 
-        assertThat(productRequest)
-                .usingRecursiveComparison()
-                .comparingOnlyFields("name", "price", "stockQuantity")
-                .isEqualTo(productResponse);
+            ProductResponse productResponse = service.create(productRequest);
 
+            assertThat(productRequest)
+                    .usingRecursiveComparison()
+                    .comparingOnlyFields("name", "price", "stockQuantity")
+                    .isEqualTo(productResponse);
+
+        }
+
+        @Test
+        @DisplayName("Should not be able to create a product when we've a conflict between product's name (already save on db)")
+        public void createProductAlreadyExists() {
+
+            var productRequest = ProductRequest
+                    .newBuilder()
+                    .setName("Product B")
+                    .setPrice(2.0)
+                    .setStockQuantity(9)
+                    .build();
+
+            assertThrows(
+                    StatusRuntimeException.class,
+                    () -> service.create(productRequest),
+                    "ALREADY_EXISTS: Product Product B already exists in the system."
+            );
+
+        }
     }
 
-    @Test
-    @DisplayName("Should not be able to create a product when we've a conflict between product's name (already save on db)")
-    public void createProductAlreadyExists() {
+    @Nested
+    class FindById {
 
-        var productRequest = ProductRequest
-                .newBuilder()
-                .setName("Product B")
-                .setPrice(2.0)
-                .setStockQuantity(9)
-                .build();
+        @Test
+        @DisplayName("Should be able to find a product with success")
+        public void findProduct() {
 
-        assertThrows(
-                StatusRuntimeException.class,
-                () -> service.create(productRequest),
-                "ALREADY_EXISTS: Product Product B already exists in the system."
-        );
+            var productFindByIdRequest = RequestById.newBuilder().setId(1).build();
+
+            var productFound = service.findById(productFindByIdRequest);
+
+            assertThat(productFound.getId()).isEqualTo(1L);
+
+        }
+
+        @Test
+        @DisplayName("Should be able to throw exception when product don't exists by id")
+        public void findProductShouldThrowError() {
+
+            var productFindByIdRequest = RequestById.newBuilder().setId(3L).build();
+
+            Assertions.assertThrows(
+                    StatusRuntimeException.class,
+                    () -> service.findById(productFindByIdRequest),
+                    "Product with ID 3 wasn't found."
+            );
+
+        }
+
 
     }
-
 
 }

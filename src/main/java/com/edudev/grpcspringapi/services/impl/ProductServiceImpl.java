@@ -3,6 +3,7 @@ package com.edudev.grpcspringapi.services.impl;
 import com.edudev.grpcspringapi.dto.ProductInputDTO;
 import com.edudev.grpcspringapi.dto.ProductOutputDTO;
 import com.edudev.grpcspringapi.exception.ProductAlreadyExistsException;
+import com.edudev.grpcspringapi.exception.ProductNotFoundException;
 import com.edudev.grpcspringapi.repository.ProductRepository;
 import com.edudev.grpcspringapi.services.IProductService;
 import com.edudev.grpcspringapi.util.ProductConverterUtil;
@@ -22,7 +23,8 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ProductOutputDTO findById(Long id) {
-        return null;
+        var product= repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
+        return ProductConverterUtil.toProductOutputDTO(product);
     }
 
     @Override

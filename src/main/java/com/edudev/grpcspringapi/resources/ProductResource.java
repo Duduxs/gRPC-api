@@ -3,6 +3,7 @@ package com.edudev.grpcspringapi.resources;
 import com.edudev.grpcspringapi.ProductRequest;
 import com.edudev.grpcspringapi.ProductResponse;
 import com.edudev.grpcspringapi.ProductServiceGrpc.ProductServiceImplBase;
+import com.edudev.grpcspringapi.RequestById;
 import com.edudev.grpcspringapi.dto.ProductInputDTO;
 import com.edudev.grpcspringapi.services.IProductService;
 import io.grpc.stub.StreamObserver;
@@ -32,6 +33,23 @@ public class ProductResource extends ProductServiceImplBase {
                 .build();
 
         responseObserver.onNext(response);
+        responseObserver.onCompleted();
+
+    }
+
+    @Override
+    public void findById(RequestById request, StreamObserver<ProductResponse> responseObserver) {
+
+        var product = productService.findById(request.getId());
+
+        var productResponse = ProductResponse.newBuilder()
+                .setId(product.id())
+                .setName(product.name())
+                .setPrice(product.price())
+                .setStockQuantity(product.quantityInStock())
+                .build();
+
+        responseObserver.onNext(productResponse);
         responseObserver.onCompleted();
 
     }
