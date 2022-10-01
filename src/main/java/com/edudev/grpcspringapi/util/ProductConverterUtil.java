@@ -11,7 +11,7 @@ public class ProductConverterUtil {
     }
 
     public static Product toProduct(ProductInputDTO p) {
-        return new Product(null, p.name(), p.price(), p.quantityInStock());
+        return new Product(3L, p.name(), p.price(), p.quantityInStock());
     }
 
 }
